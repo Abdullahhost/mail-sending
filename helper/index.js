@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   host: "smpt.gmail.com",
   auth: {
-    user: process.env.SMTP_MAIL,
+    user: process.env.SMTP_MAIL_ONE,
     pass: process.env.SMTP_PASS,
   },
 });
@@ -24,18 +24,21 @@ export const sendEmailTemplate = async (
   userName,
   userEmail,
   userOrganization,
-  userMessage
+  userMessage,
+  sendingEmail
 ) => {
   try {
     ejs.renderFile(
       path.join(__dirname, "../views/templates/email.ejs"),
-      { userName, userEmail, userOrganization, userMessage },
+      { userName, userEmail, userOrganization, userMessage, sendingEmail },
       (err, data) => {
         if (err) {
           console.log(err);
         } else {
           var mailOptions = {
-            to: process.env.SMTP_MAIL,
+            to: sendingEmail
+              ? process.env.SMTP_MAIL_ONE
+              : [process.env.SMTP_MAIL_ONE, process.env.SMTP_MAIL],
             from: userEmail,
             subject: "Project collabrating with Mamun Hossain",
             html: data,
@@ -53,3 +56,6 @@ export const sendEmailTemplate = async (
     console.log(err);
   }
 };
+
+// ? [process.env.SMTP_MAIL, process.env.SMTP_MAIL_ONE]
+// : process.env.SMTP_MAIL_ONE,
